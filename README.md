@@ -1,6 +1,12 @@
 # OzNetNerd Deep Security
 
-A convenient way to interact with Trend Micro Deep Security.
+Convenience Python module for interacting with Trend Micro Deep Security
+
+## Installation
+
+```
+pip3 install onnds
+```
 
 # Contact
 

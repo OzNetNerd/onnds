@@ -7,7 +7,7 @@ import json
 
 import deepsecurity as api
 from deepsecurity.rest import ApiException
-from .libs.loggers import Loggers
+from onnlogger import Loggers
 
 if os.path.exists('db.py'):
     from .db import SetupDb
