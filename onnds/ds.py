@@ -16,7 +16,7 @@ PAGE_SIZE = 5000
 
 
 class Ds:
-    def __init__(self, app_name, console_logger=False, log_file_path='', print_logger=False, log_level='INFO'):
+    def __init__(self, app_name, console_logger=False, print_logger=False, log_level='INFO', log_file_path=''):
         """Initiate Ds class
 
         Completes the following tasks:
@@ -26,7 +26,7 @@ class Ds:
             * Prepares DS API
         """
         self.app_name = app_name
-        self.logger = Loggers(self.app_name, console_logger, log_file_path, print_logger, log_level)
+        self.logger = Loggers(self.app_name, console_logger, print_logger, log_level, log_file_path)
 
         try:
             self.logger.entry('info', 'Obtaining DS API key')
