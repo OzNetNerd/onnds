@@ -16,7 +16,7 @@ PAGE_SIZE = 5000
 
 
 class Ds:
-    def __init__(self, app_name, console_logger=False, print_logger=False, log_level='INFO', log_file_path=''):
+    def __init__(self, app_name='', console_logger=False, print_logger=False, log_level='INFO', log_file_path=''):
         """Initiate Ds class
 
         Completes the following tasks:
@@ -1732,13 +1732,31 @@ class Ds:
         return ips_rules
 
     @staticmethod
-    def epoch_to_timestamp(epoch_time):
+    def epoch_to_timestamp(epoch_time) -> str:
+        """Convert epoch to date and time
+
+        Examples:
+            > self.epoch_to_timestamp(1568523742006)
+            15/09/2019, 15:02:22 AEST
+
+        Returns:
+            str: e.g 15/09/2019, 15:02:22 AEST
+        """
         epoch_strip = str(epoch_time)[:-3]
         epoch = int(epoch_strip)
 
-        return time.strftime('%d/%m/%Y, %H:%M:%S %Z', time.localtime(epoch))
+        converted_time = time.strftime('%d/%m/%Y, %H:%M:%S %Z', time.localtime(epoch))
+        return converted_time
 
-    def generate_csv(self, report_entries, filename):
+    def generate_csv(self, report_entries, filename) -> None:
+        """Turns a list of dicts into a CSV file
+
+        Examples:
+            ```[{'Computer ID': 'ip-172-31-28-113.ap-southeast-2.compute.internal', 'Hostname': 'ip-172-31-28-113.ap-southeast-2.compute.internal', 'Display Name': '', 'Host Description': '', 'Platform': 'Amazon Linux 2 (64 bit) (4.14.123-111.109.amzn2.x86_64)'}]
+            Computer ID,Hostname,Display Name,Host Description,Platform
+            ip-172-31-28-113.ap-southeast-2.compute.internal,ip-172-31-28-113.ap-southeast-2.compute.internal,,,Amazon Linux 2 (64 bit) (4.14.123-111.109.amzn2.x86_64)```
+
+            """
         with open(filename, 'w') as f:
             columns = list(report_entries[0].keys())
             writer = csv.DictWriter(f, fieldnames=columns)
@@ -1746,12 +1764,14 @@ class Ds:
             for row in report_entries:
                 writer.writerow(row)
 
-        self.logger.entry('info', 'Done')
+        self.logger.entry('info', 'Report generated successfully')
 
     @staticmethod
-    def _get_env_var(env_var, default):
-        '''Required as Docker passes in a blank string if env vars are not specified. os.environ.get sees it as valid
-        input and therefore does not fall back to the default option'''
+    def _get_env_var(env_var, default) -> str:
+        """Gets an environment variable or returns the default
+
+        Required as Docker passes in a blank string if env vars are not specified. os.environ.get sees it as valid
+        input and therefore does not fall back to the default option"""
 
         env_var_value = os.environ.get(env_var)
 
@@ -2753,7 +2773,7 @@ class Ds:
                 self.logger.entry('critical', str(e))
                 sys.exit(1)
 
-    def set_computer_policy_id(self, computer_id, policy_id):
+    def set_computer_policy_id(self, computer_id, policy_id) -> None:
         """Moves computer to specified Policy"""
         computers_api = api.ComputersApi(self.api_client)
         computer = api.Computer()
@@ -2767,7 +2787,7 @@ class Ds:
             sys.exit(1)
 
     @staticmethod
-    def _join_ints_as_str(int_list, sep=','):
+    def _join_ints_as_str(int_list, sep=',') -> str:
         """Turns a list of integers into a CSV string"""
         joined_ips_rules = sep.join(str(rule_id) for rule_id in int_list)
 
@@ -2802,7 +2822,7 @@ class Ds:
 
         return joined_output
 
-    def json_response(self, status_code, msg) -> json:
+    def json_response(self, status_code, msg) -> dict:
         """Formats Lambda output
 
             Examples:
@@ -2825,7 +2845,7 @@ class Ds:
 
         return json_output
 
-    def str_to_bool(self, user_input, error_message):
+    def str_to_bool(self, user_input, error_message) -> bool:
         """Turns user input into a bool"""
 
         if user_input == 'true':
