@@ -26,7 +26,8 @@ class Ds:
             * Prepares DS API
         """
         self.app_name = app_name
-        self.logger = Loggers(self.app_name, console_logger, print_logger, log_level, log_file_path)
+        self.logger = Loggers(logger_name=self.app_name, console_logger=console_logger, print_logger=print_logger,
+                              log_level=log_level, log_file_path=log_file_path)
 
         try:
             self.logger.entry('info', 'Obtaining DS API key')
