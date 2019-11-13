@@ -4,3 +4,6 @@ build/
 dist/
 onnds.egg-info/
 __pycache__/
+docs/_build
+docs/_static
+docs/_templates
