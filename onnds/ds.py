@@ -1831,8 +1831,39 @@ class Ds:
             self.logger.entry('critical', str(e))
             sys.exit(1)
 
-    def get_policy(self, policy_name) -> api.Policy:
-        """Obtains a policy
+    def get_applied_ips_rules(self, policy_obj) -> list:
+        """List of IPS rules applied to a policy
+
+        Args:
+            policy_obj (api.models.policy.Policy): Policy object
+
+        Examples:
+            ::
+
+                [5445, 5892]
+
+        Returns:
+            list: List of applied IPS rules
+        """
+
+        rule_ids = policy_obj.intrusion_prevention.rule_ids
+        existing_ips_rule_ids = rule_ids if rule_ids else []
+
+        if existing_ips_rule_ids:
+            existing_ips_rule_ids_str = self._join_ints_as_str(existing_ips_rule_ids)
+            self.logger.entry('info', f'Policy has the following rules applied: '
+                                      f'{existing_ips_rule_ids_str}')
+
+        return existing_ips_rule_ids
+
+    def get_policy(self, search_field, search_value, search_type) -> api.Policy:
+        """Searches for a policy based on a search term and field name
+
+        Args:
+            search_field: Term to search for, e.g `ID`, `name`
+            search_value: `api.Policy` object field value to match
+            search_type (api.SearchCriteria()): `boolean`, `choice`, `id`, `null`, `numeric`, `string` - see the docs -
+            https://automation.deepsecurity.trendmicro.com/article/dsaas/how-to-search?platform=dsaas - for more info
 
         Examples:
             ::
