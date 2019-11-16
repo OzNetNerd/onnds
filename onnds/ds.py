@@ -1521,14 +1521,19 @@ class Ds:
         Returns:
             Computer object
         """
-
-        self.logger.entry('info', f'Searching for "{hostname}" IDs...')
-
-        search_field = 'hostName'
         search_computers_api = api.ComputersApi(self.api_client).search_computers
-        result = self._find_exact_match(search_field, hostname, search_computers_api)
+        result = self._find_exact_match(search_field='hostName', search_value=hostname, search_type='string',
+                                        object_api=search_computers_api)
 
-        return result.computers[0]
+        try:
+            output = result.computers[0]
+
+        except IndexError:
+            msg = f'Could not find {hostname}. Please ensure the Deep Security agent has been installed'
+            self.logger.entry('critical', msg)
+            sys.exit(msg)
+
+        return output
 
     def get_ips_rules(self) -> dict:
         """IPS rule map with Rule ID as key
@@ -1797,15 +1802,22 @@ class Ds:
         self.logger.entry('debug', pformat(cve_map))
         return cve_map
 
-    def _find_exact_match(self, search_field, search_string, object_api):
+    def _find_exact_match(self, search_field, search_value, search_type, object_api):
         """Finds an exact match of an object and returns it
 
-        For example, searching for a `Policy` name will return a `Policies` object"""
+        search_field: Term to search for, e.g `ID`, `name`
+        search_value: Object field value to match
+        search_type (api.SearchCriteria()): `boolean`, `choice`, `id`, `null`, `numeric`, `string` - see the docs -
+        https://automation.deepsecurity.trendmicro.com/article/dsaas/how-to-search?platform=dsaas - for more info
+        object_api: API object
+        """
+        self.logger.entry("info", f'Searching for "{search_value}" in field "{search_field}"...')
 
         search_criteria = api.SearchCriteria()
         search_criteria.field_name = search_field
-        search_criteria.string_test = 'equal'
-        search_criteria.string_value = search_string
+
+        setattr(search_criteria, f'{search_type}_test', 'equal')
+        setattr(search_criteria, f'{search_type}_value', search_value)
 
         search_filter = api.SearchFilter(None, [search_criteria])
         search_filter.max_items = 1
@@ -2625,13 +2637,18 @@ class Ds:
         api.Policy: Policy object
 
         """
-        self.logger.entry("info", f'Searching for "{policy_name}" policy ID...')
-
-        search_field = 'name'
         search_policies_api = api.PoliciesApi(self.api_client).search_policies
-        result = self._find_exact_match(search_field, policy_name, search_policies_api)
+        result = self._find_exact_match(search_field, search_value, search_type, search_policies_api)
 
-        return result.policies[0]
+        try:
+            output = result.policies[0]
+
+        except IndexError:
+            msg = f'Could not find {search_value}'
+            self.logger.entry('critical', msg)
+            sys.exit(msg)
+
+        return output
 
     def create_policy(self, policy_name) -> int:
         """Creates a Deep Security policy
