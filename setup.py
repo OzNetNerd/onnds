@@ -5,14 +5,14 @@ with open('README.md', 'r') as f:
 
 setup(
     name='onnds',
-    version='0.0.6',
+    version='0.0.7',
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=['onnds'],
     url='http://oznetnerd.com',
     install_requires=[
         'deep-security-api>=12.0.327',
-        'onnlogger>=0.0.3',
+        'onnlogger==0.0.3',
     ],
     license='',
     author='Will Robinson',
