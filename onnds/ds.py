@@ -2673,13 +2673,12 @@ class Ds:
 
         try:
             output = result.policies[0]
+            return output
 
         except IndexError:
-            msg = f'Could not find {search_value}'
-            self.logger.entry('critical', msg)
-            sys.exit(msg)
+            self.logger.entry('info', f'Could not find {search_value}')
 
-        return output
+            raise IndexError
 
     def create_policy(self, policy_name) -> int:
         """Creates a Deep Security policy
