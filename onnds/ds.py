@@ -2724,14 +2724,30 @@ class Ds:
             self.logger.entry('critical', str(e))
             sys.exit(1)
 
-    def add_ips_rules(self, policy_id, ips_rule_ids) -> None:
-        """Adds IPS rule(s) to a policy"""
+    def add_ips_rules(self, policy_id, ips_rule_ids) -> dict:
+        """Adds IPS rule(s) to a policy
+
+        Examples::
+            ::
+
+                {
+                    'assigned_application_type_ids': [],
+                    'assigned_rule_ids': [],
+                    'last_recommendation_scan_date': None,
+                    'recommendation_scan_status': 'none',
+                    'recommended_to_assign_rule_ids': [],
+                    'recommended_to_unassign_rule_ids': []
+                }
+
+            Returns:
+                  dict
+        """
         ips_api = api.PolicyIntrusionPreventionRuleAssignmentsRecommendationsApi(self.api_client)
         ips_rule_api = api.RuleIDs()
         ips_rule_api.rule_ids = ips_rule_ids
 
         try:
-            ips_api.add_intrusion_prevention_rule_ids_to_policy(
+            output = ips_api.add_intrusion_prevention_rule_ids_to_policy(
                 policy_id,
                 api_version=self.api_version,
                 intrusion_prevention_rule_ids=ips_rule_api,
@@ -2743,6 +2759,8 @@ class Ds:
         except ApiException as e:
             self.logger.entry('critical', str(e))
             sys.exit(1)
+
+        return output
 
     def remove_ips_rules(self, policy_id, ips_rule_ids) -> None:
         """Removes IPS rule(s) from a policy
@@ -2758,7 +2776,7 @@ class Ds:
 
         for ips_rule_id in ips_rule_ids:
             try:
-                ips_api.remove_intrusion_prevention_rule_id_from_policy(
+                output = ips_api.remove_intrusion_prevention_rule_id_from_policy(
                     policy_id,
                     ips_rule_id,
                     api_version=self.api_version,
@@ -2767,22 +2785,1146 @@ class Ds:
 
                 self.logger.entry('info', f'Successfully removed IPS rule ID {ips_rule_id}')
 
+                return output
+
             except ApiException as e:
                 self.logger.entry('critical', str(e))
                 sys.exit(1)
 
-    def set_computer_policy_id(self, computer_id, policy_id) -> None:
-        """Moves computer to specified Policy"""
+    def set_computer_policy_id(self, computer_id, policy_id) -> dict:
+        """Moves computer to specified Policy
+
+        Examples:
+            ::
+
+                {
+                    'agent_finger_print': '4F:E3:DD:C1:FD:D1:FB:93:D8:D0:C3:21:69:5A:1C:83:F6:C1:1E:C2',
+                    'agent_version': '12.0.0.563',
+                    'anti_malware': {
+                        'last_manual_scan': None,
+                        'last_scheduled_scan': None,
+                        'manual_scan_configuration_id': 2,
+                        'module_status': {
+                            'agent_status': 'inactive',
+                            'agent_status_message': 'Off, installed',
+                            'appliance_status': None,
+                            'appliance_status_message': None
+                        },
+                        'real_time_scan_configuration_id': 1,
+                        'real_time_scan_schedule_id': 4,
+                        'scheduled_scan_configuration_id': 3,
+                        'state': 'off'
+                    },
+                    'appliance_finger_print': None,
+                    'application_control': {
+                        'block_unrecognized': False,
+                        'maintenance_mode_duration': None,
+                        'maintenance_mode_end_time': None,
+                        'maintenance_mode_start_time': None,
+                        'maintenance_mode_status': 'off',
+                        'module_status': {
+                            'agent_status': 'inactive',
+                            'agent_status_message': 'Off, not '
+                            'installed',
+                            'appliance_status': None,
+                            'appliance_status_message': None
+                        },
+                        'ruleset_id': None,
+                        'state': 'off'
+                    },
+                    'asset_importance_id': None,
+                    'azure_arm_virtual_machine_summary': None,
+                    'azure_vm_virtual_machine_summary': None,
+                    'bios_uuid': 'ec2e87d1-b402-6bff-07f9-1cac94545a1c',
+                    'computer_settings': {
+                        'anti_malware_setting_behavior_monitoring_scan_exclusion_list': {
+                            'value': ''
+                        },
+                        'anti_malware_setting_combined_mode_protection_source': {
+                            'value': 'Appliance '
+                            'preferred'
+                        },
+                        'anti_malware_setting_connected_threat_defense_suspicious_file_ddan_submission_enabled': {
+                            'value': 'true'
+                        },
+                        'anti_malware_setting_connected_threat_defense_use_control_manager_suspicious_object_list_enabled': {
+                            'value': 'true'
+                        },
+                        'anti_malware_setting_document_exploit_protection_rule_exceptions': {
+                            'value': ''
+                        },
+                        'anti_malware_setting_file_hash_enabled': {
+                            'value': 'false'
+                        },
+                        'anti_malware_setting_file_hash_md5_enabled': {
+                            'value': 'false'
+                        },
+                        'anti_malware_setting_file_hash_sha256_enabled': {
+                            'value': 'false'
+                        },
+                        'anti_malware_setting_file_hash_size_max_mbytes': {
+                            'value': '128'
+                        },
+                        'anti_malware_setting_identified_files_space_max_mbytes': {
+                            'value': '1024'
+                        },
+                        'anti_malware_setting_malware_scan_multithreaded_processing_enabled': {
+                            'value': 'false'
+                        },
+                        'anti_malware_setting_nsx_security_tagging_enabled': {
+                            'value': 'true'
+                        },
+                        'anti_malware_setting_nsx_security_tagging_on_remediation_failure_enabled': {
+                            'value': 'true'
+                        },
+                        'anti_malware_setting_nsx_security_tagging_remove_on_clean_scan_enabled': {
+                            'value': 'true'
+                        },
+                        'anti_malware_setting_nsx_security_tagging_value': {
+                            'value': 'ANTI_VIRUS.VirusFound.threat=medium'
+                        },
+                        'anti_malware_setting_predictive_machine_learning_exceptions': {
+                            'value': ''
+                        },
+                        'anti_malware_setting_scan_cache_on_demand_config_id': {
+                            'value': '1'
+                        },
+                        'anti_malware_setting_scan_cache_real_time_config_id': {
+                            'value': '2'
+                        },
+                        'anti_malware_setting_scan_file_size_max_mbytes': {
+                            'value': '0'
+                        },
+                        'anti_malware_setting_smart_protection_global_server_enabled': {
+                            'value': 'true'
+                        },
+                        'anti_malware_setting_smart_protection_global_server_use_proxy_enabled': {
+                            'value': 'false'
+                        },
+                        'anti_malware_setting_smart_protection_local_server_allow_off_domain_global': {
+                            'value': 'false'
+                        },
+                        'anti_malware_setting_smart_protection_local_server_urls': {
+                            'value': ''
+                        },
+                        'anti_malware_setting_smart_protection_server_connection_lost_warning_enabled': {
+                            'value': 'true'
+                        },
+                        'anti_malware_setting_smart_scan_state': {
+                            'value': 'Automatic'
+                        },
+                        'anti_malware_setting_spyware_approved_list': {
+                            'value': ''
+                        },
+                        'anti_malware_setting_syslog_config_id': {
+                            'value': '0'
+                        },
+                        'anti_malware_setting_virtual_appliance_on_demand_scan_cache_entries_max': {
+                            'value': '500000'
+                        },
+                        'anti_malware_setting_virtual_appliance_real_time_scan_cache_entries_max': {
+                            'value': '500000'
+                        },
+                        'application_control_setting_execution_enforcement_level': {
+                            'value': 'Allow '
+                            'unrecognized '
+                            'software '
+                            'until '
+                            'it '
+                            'is '
+                            'explicitly '
+                            'blocked'
+                        },
+                        'application_control_setting_ruleset_mode': {
+                            'value': 'Use '
+                            'local '
+                            'ruleset'
+                        },
+                        'application_control_setting_shared_ruleset_id': {
+                            'value': '0'
+                        },
+                        'application_control_setting_syslog_config_id': {
+                            'value': '0'
+                        },
+                        'firewall_setting_anti_evasion_check_evasive_retransmit': {
+                            'value': 'Allow'
+                        },
+                        'firewall_setting_anti_evasion_check_fin_no_connection': {
+                            'value': 'Allow'
+                        },
+                        'firewall_setting_anti_evasion_check_fragmented_packets': {
+                            'value': 'Allow'
+                        },
+                        'firewall_setting_anti_evasion_check_out_no_connection': {
+                            'value': 'Allow'
+                        },
+                        'firewall_setting_anti_evasion_check_paws': {
+                            'value': 'Ignore'
+                        },
+                        'firewall_setting_anti_evasion_check_rst_no_connection': {
+                            'value': 'Allow'
+                        },
+                        'firewall_setting_anti_evasion_check_tcp_checksum': {
+                            'value': 'Allow'
+                        },
+                        'firewall_setting_anti_evasion_check_tcp_congestion_flags': {
+                            'value': 'Allow'
+                        },
+                        'firewall_setting_anti_evasion_check_tcp_paws_zero': {
+                            'value': 'Allow'
+                        },
+                        'firewall_setting_anti_evasion_check_tcp_rst_fin_flags': {
+                            'value': 'Deny'
+                        },
+                        'firewall_setting_anti_evasion_check_tcp_split_handshake': {
+                            'value': 'Deny'
+                        },
+                        'firewall_setting_anti_evasion_check_tcp_syn_fin_flags': {
+                            'value': 'Deny'
+                        },
+                        'firewall_setting_anti_evasion_check_tcp_syn_rst_flags': {
+                            'value': 'Deny'
+                        },
+                        'firewall_setting_anti_evasion_check_tcp_syn_with_data': {
+                            'value': 'Deny'
+                        },
+                        'firewall_setting_anti_evasion_check_tcp_urgent_flags': {
+                            'value': 'Allow'
+                        },
+                        'firewall_setting_anti_evasion_check_tcp_zero_flags': {
+                            'value': 'Deny'
+                        },
+                        'firewall_setting_anti_evasion_security_posture': {
+                            'value': 'Normal'
+                        },
+                        'firewall_setting_anti_evasion_tcp_paws_window_policy': {
+                            'value': '0'
+                        },
+                        'firewall_setting_combined_mode_protection_source': {
+                            'value': 'Agent '
+                            'preferred'
+                        },
+                        'firewall_setting_config_package_exceeds_alert_max_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_ack_timeout': {
+                            'value': '1 '
+                            'Second'
+                        },
+                        'firewall_setting_engine_option_allow_null_ip_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_block_ipv6_agent8_and_earlier_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_block_ipv6_agent9_and_later_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_block_same_src_dst_ip_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_boot_start_timeout': {
+                            'value': '20 '
+                            'Seconds'
+                        },
+                        'firewall_setting_engine_option_bypass_cisco_waas_connections_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_close_timeout': {
+                            'value': '0 '
+                            'Seconds'
+                        },
+                        'firewall_setting_engine_option_close_wait_timeout': {
+                            'value': '2 '
+                            'Minutes'
+                        },
+                        'firewall_setting_engine_option_closing_timeout': {
+                            'value': '1 '
+                            'Second'
+                        },
+                        'firewall_setting_engine_option_cold_start_timeout': {
+                            'value': '5 '
+                            'Minutes'
+                        },
+                        'firewall_setting_engine_option_connection_cleanup_timeout': {
+                            'value': '10 '
+                            'Seconds'
+                        },
+                        'firewall_setting_engine_option_connections_cleanup_max': {
+                            'value': '1000'
+                        },
+                        'firewall_setting_engine_option_connections_num_icmp_max': {
+                            'value': '10000'
+                        },
+                        'firewall_setting_engine_option_connections_num_tcp_max': {
+                            'value': '10000'
+                        },
+                        'firewall_setting_engine_option_connections_num_udp_max': {
+                            'value': '1000000'
+                        },
+                        'firewall_setting_engine_option_debug_mode_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_debug_packet_num_max': {
+                            'value': '8'
+                        },
+                        'firewall_setting_engine_option_disconnect_timeout': {
+                            'value': '60 '
+                            'Seconds'
+                        },
+                        'firewall_setting_engine_option_drop6_to4_bogons_addresses_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_drop_evasive_retransmit_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_drop_ip_zero_payload_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_drop_ipv6_bogons_addresses_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_drop_ipv6_ext_type0_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_drop_ipv6_fragments_lower_than_min_mtu_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_drop_ipv6_reserved_addresses_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_drop_ipv6_site_local_addresses_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_drop_teredo_anomalies_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_drop_unknown_ssl_protocol_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_error_timeout': {
+                            'value': '10 '
+                            'Seconds'
+                        },
+                        'firewall_setting_engine_option_established_timeout': {
+                            'value': '3 '
+                            'Hours'
+                        },
+                        'firewall_setting_engine_option_event_nodes_max': {
+                            'value': '20000'
+                        },
+                        'firewall_setting_engine_option_filter_ipv4_tunnels': {
+                            'value': 'Disable '
+                            'Detection '
+                            'of '
+                            'IPv4 '
+                            'Tunnels'
+                        },
+                        'firewall_setting_engine_option_filter_ipv6_tunnels': {
+                            'value': 'Disable '
+                            'Detection '
+                            'of '
+                            'IPv6 '
+                            'Tunnels'
+                        },
+                        'firewall_setting_engine_option_fin_wait1_timeout': {
+                            'value': '2 '
+                            'Minutes'
+                        },
+                        'firewall_setting_engine_option_force_allow_dhcp_dns': {
+                            'value': 'Allow '
+                            'DNS '
+                            'Query '
+                            'and '
+                            'DHCP '
+                            'Client'
+                        },
+                        'firewall_setting_engine_option_force_allow_icmp_type3_code4': {
+                            'value': 'Add '
+                            'Force '
+                            'Allow '
+                            'rule '
+                            'for '
+                            'ICMP '
+                            'type3 '
+                            'code4'
+                        },
+                        'firewall_setting_engine_option_fragment_offset_min': {
+                            'value': '60'
+                        },
+                        'firewall_setting_engine_option_fragment_size_min': {
+                            'value': '120'
+                        },
+                        'firewall_setting_engine_option_generate_connection_events_icmp_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_generate_connection_events_tcp_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_generate_connection_events_udp_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_icmp_timeout': {
+                            'value': '60 '
+                            'Seconds'
+                        },
+                        'firewall_setting_engine_option_ignore_status_code0': {
+                            'value': 'None'
+                        },
+                        'firewall_setting_engine_option_ignore_status_code1': {
+                            'value': 'None'
+                        },
+                        'firewall_setting_engine_option_ignore_status_code2': {
+                            'value': 'None'
+                        },
+                        'firewall_setting_engine_option_last_ack_timeout': {
+                            'value': '3 '
+                            'Minutes'
+                        },
+                        'firewall_setting_engine_option_log_all_packet_data_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_log_events_per_second_max': {
+                            'value': '100'
+                        },
+                        'firewall_setting_engine_option_log_one_packet_period': {
+                            'value': '5 '
+                            'Minutes'
+                        },
+                        'firewall_setting_engine_option_log_one_packet_within_period_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_log_packet_length_max': {
+                            'value': '1500 '
+                            'Bytes'
+                        },
+                        'firewall_setting_engine_option_logging_policy': {
+                            'value': 'Default'
+                        },
+                        'firewall_setting_engine_option_silent_tcp_connection_drop_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_option_ssl_session_size': {
+                            'value': 'Low '
+                            '- '
+                            '2500'
+                        },
+                        'firewall_setting_engine_option_ssl_session_time': {
+                            'value': '24 '
+                            'Hours'
+                        },
+                        'firewall_setting_engine_option_strict_terodo_port_check_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_engine_option_syn_rcvd_timeout': {
+                            'value': '60 '
+                            'Seconds'
+                        },
+                        'firewall_setting_engine_option_syn_sent_timeout': {
+                            'value': '20 '
+                            'Seconds'
+                        },
+                        'firewall_setting_engine_option_tcp_mss_limit': {
+                            'value': 'No '
+                            'Limit'
+                        },
+                        'firewall_setting_engine_option_tunnel_depth_max': {
+                            'value': '1'
+                        },
+                        'firewall_setting_engine_option_tunnel_depth_max_exceeded_action': {
+                            'value': 'Drop'
+                        },
+                        'firewall_setting_engine_option_udp_timeout': {
+                            'value': '20 '
+                            'Seconds'
+                        },
+                        'firewall_setting_engine_option_verify_tcp_checksum_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_engine_options_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_event_log_file_cached_entries_life_time': {
+                            'value': '30 '
+                            'Minutes'
+                        },
+                        'firewall_setting_event_log_file_cached_entries_num': {
+                            'value': '128'
+                        },
+                        'firewall_setting_event_log_file_cached_entries_stale_time': {
+                            'value': '15 '
+                            'Minutes'
+                        },
+                        'firewall_setting_event_log_file_ignore_source_ip_list_id': {
+                            'value': ''
+                        },
+                        'firewall_setting_event_log_file_retain_num': {
+                            'value': '3'
+                        },
+                        'firewall_setting_event_log_file_size_max': {
+                            'value': '4 '
+                            'MB'
+                        },
+                        'firewall_setting_events_out_of_allowed_policy_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_failure_response_engine_system': {
+                            'value': 'Fail '
+                            'closed'
+                        },
+                        'firewall_setting_failure_response_packet_sanity_check': {
+                            'value': 'Fail '
+                            'closed'
+                        },
+                        'firewall_setting_interface_isolation_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_interface_limit_one_active_enabled': {
+                            'value': 'false'
+                        },
+                        'firewall_setting_interface_patterns': {
+                            'value': ''
+                        },
+                        'firewall_setting_network_engine_mode': {
+                            'value': 'Inline'
+                        },
+                        'firewall_setting_reconnaissance_block_fingerprint_probe_duration': {
+                            'value': 'No'
+                        },
+                        'firewall_setting_reconnaissance_block_network_or_port_scan_duration': {
+                            'value': 'No'
+                        },
+                        'firewall_setting_reconnaissance_block_tcp_null_scan_duration': {
+                            'value': 'No'
+                        },
+                        'firewall_setting_reconnaissance_block_tcp_syn_fin_scan_duration': {
+                            'value': 'No'
+                        },
+                        'firewall_setting_reconnaissance_block_tcp_xmas_attack_duration': {
+                            'value': 'No'
+                        },
+                        'firewall_setting_reconnaissance_detect_fingerprint_probe_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_reconnaissance_detect_network_or_port_scan_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_reconnaissance_detect_tcp_null_scan_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_reconnaissance_detect_tcp_syn_fin_scan_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_reconnaissance_detect_tcp_xmas_attack_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_reconnaissance_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_reconnaissance_exclude_ip_list_id': {
+                            'value': '1'
+                        },
+                        'firewall_setting_reconnaissance_include_ip_list_id': {
+                            'value': ''
+                        },
+                        'firewall_setting_reconnaissance_notify_fingerprint_probe_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_reconnaissance_notify_network_or_port_scan_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_reconnaissance_notify_tcp_null_scan_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_reconnaissance_notify_tcp_syn_fin_scan_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_reconnaissance_notify_tcp_xmas_attack_enabled': {
+                            'value': 'true'
+                        },
+                        'firewall_setting_virtual_and_container_network_scan_enabled': {
+                            'value': 'false'
+                        },
+                        'integrity_monitoring_setting_auto_apply_recommendations_enabled': {
+                            'value': 'No'
+                        },
+                        'integrity_monitoring_setting_combined_mode_protection_source': {
+                            'value': 'Appliance '
+                            'preferred'
+                        },
+                        'integrity_monitoring_setting_content_hash_algorithm': {
+                            'value': 'sha1'
+                        },
+                        'integrity_monitoring_setting_cpu_usage_level': {
+                            'value': 'High'
+                        },
+                        'integrity_monitoring_setting_realtime_enabled': {
+                            'value': 'false'
+                        },
+                        'integrity_monitoring_setting_scan_cache_config_id': {
+                            'value': '3'
+                        },
+                        'integrity_monitoring_setting_syslog_config_id': {
+                            'value': '0'
+                        },
+                        'integrity_monitoring_setting_virtual_appliance_optimization_scan_cache_entries_max': {
+                            'value': '500000'
+                        },
+                        'intrusion_prevention_setting_auto_apply_recommendations_enabled': {
+                            'value': 'Yes'
+                        },
+                        'intrusion_prevention_setting_combined_mode_protection_source': {
+                            'value': 'Agent '
+                            'preferred'
+                        },
+                        'intrusion_prevention_setting_engine_option_fragmented_ip_keep_max': {
+                            'value': '1000'
+                        },
+                        'intrusion_prevention_setting_engine_option_fragmented_ip_packet_send_icmp_enabled': {
+                            'value': 'true'
+                        },
+                        'intrusion_prevention_setting_engine_option_fragmented_ip_timeout': {
+                            'value': '60 '
+                            'Seconds'
+                        },
+                        'intrusion_prevention_setting_engine_option_fragmented_ip_unconcerned_mac_address_bypass_enabled': {
+                            'value': 'false'
+                        },
+                        'intrusion_prevention_setting_engine_options_enabled': {
+                            'value': 'false'
+                        },
+                        'intrusion_prevention_setting_log_data_rule_first_match_enabled': {
+                            'value': 'true'
+                        },
+                        'intrusion_prevention_setting_nsx_security_tagging_detect_mode_level': {
+                            'value': 'No '
+                            'Tagging'
+                        },
+                        'intrusion_prevention_setting_nsx_security_tagging_prevent_mode_level': {
+                            'value': 'No '
+                            'Tagging'
+                        },
+                        'intrusion_prevention_setting_virtual_and_container_network_scan_enabled': {
+                            'value': 'true'
+                        },
+                        'log_inspection_setting_auto_apply_recommendations_enabled': {
+                            'value': 'No'
+                        },
+                        'log_inspection_setting_severity_clipping_agent_event_send_syslog_level_min': {
+                            'value': 'Medium '
+                            '(6)'
+                        },
+                        'log_inspection_setting_severity_clipping_agent_event_store_level_min': {
+                            'value': 'Medium '
+                            '(6)'
+                        },
+                        'log_inspection_setting_syslog_config_id': {
+                            'value': '0'
+                        },
+                        'platform_setting_agent_communications_direction': {
+                            'value': 'Agent/Appliance '
+                            'Initiated'
+                        },
+                        'platform_setting_agent_events_send_interval': {
+                            'value': '60 '
+                            'Seconds'
+                        },
+                        'platform_setting_agent_self_protection_enabled': {
+                            'value': 'false'
+                        },
+                        'platform_setting_agent_self_protection_password': {
+                            'value': ''
+                        },
+                        'platform_setting_agent_self_protection_password_enabled': {
+                            'value': 'false'
+                        },
+                        'platform_setting_auto_assign_new_intrusion_prevention_rules_enabled': {
+                            'value': 'true'
+                        },
+                        'platform_setting_auto_update_anti_malware_engine_enabled': {
+                            'value': 'false'
+                        },
+                        'platform_setting_combined_mode_network_group_protection_source': {
+                            'value': 'Agent '
+                            'preferred'
+                        },
+                        'platform_setting_environment_variable_overrides': {
+                            'value': ''
+                        },
+                        'platform_setting_heartbeat_inactive_vm_offline_alert_enabled': {
+                            'value': 'false'
+                        },
+                        'platform_setting_heartbeat_interval': {
+                            'value': '10 '
+                            'Minutes'
+                        },
+                        'platform_setting_heartbeat_local_time_shift_alert_threshold': {
+                            'value': 'Unlimited'
+                        },
+                        'platform_setting_heartbeat_missed_alert_threshold': {
+                            'value': '5'
+                        },
+                        'platform_setting_inactive_agent_cleanup_override_enabled': {
+                            'value': 'false'
+                        },
+                        'platform_setting_notifications_suppress_popups_enabled': {
+                            'value': 'false'
+                        },
+                        'platform_setting_recommendation_ongoing_scans_interval': {
+                            'value': '7 '
+                            'Days'
+                        },
+                        'platform_setting_relay_state': {
+                            'value': 'false'
+                        },
+                        'platform_setting_scan_cache_concurrency_max': {
+                            'value': '1'
+                        },
+                        'platform_setting_scan_open_port_list_id': {
+                            'value': '1-1024'
+                        },
+                        'platform_setting_smart_protection_anti_malware_global_server_proxy_id': {
+                            'value': ''
+                        },
+                        'platform_setting_smart_protection_global_server_enabled': {
+                            'value': 'true'
+                        },
+                        'platform_setting_smart_protection_global_server_proxy_id': {
+                            'value': ''
+                        },
+                        'platform_setting_smart_protection_global_server_use_proxy_enabled': {
+                            'value': 'false'
+                        },
+                        'platform_setting_troubleshooting_logging_level': {
+                            'value': 'Do '
+                            'Not '
+                            'Override'
+                        },
+                        'platform_setting_upgrade_on_activation_enabled': None,
+                        'web_reputation_setting_alerting_enabled': {
+                            'value': 'false'
+                        },
+                        'web_reputation_setting_allowed_url_domains': {
+                            'value': ''
+                        },
+                        'web_reputation_setting_allowed_urls': {
+                            'value': ''
+                        },
+                        'web_reputation_setting_blocked_url_domains': {
+                            'value': ''
+                        },
+                        'web_reputation_setting_blocked_url_keywords': {
+                            'value': ''
+                        },
+                        'web_reputation_setting_blocked_urls': {
+                            'value': ''
+                        },
+                        'web_reputation_setting_blocking_page_link': {
+                            'value': 'http://sitesafety.trendmicro.com/'
+                        },
+                        'web_reputation_setting_combined_mode_protection_source': {
+                            'value': 'Agent '
+                            'preferred'
+                        },
+                        'web_reputation_setting_monitor_port_list_id': {
+                            'value': '80,8080'
+                        },
+                        'web_reputation_setting_security_block_untested_pages_enabled': {
+                            'value': 'false'
+                        },
+                        'web_reputation_setting_security_level': {
+                            'value': 'Medium'
+                        },
+                        'web_reputation_setting_smart_protection_global_server_use_proxy_enabled': {
+                            'value': 'false'
+                        },
+                        'web_reputation_setting_smart_protection_local_server_allow_off_domain_global': {
+                            'value': 'false'
+                        },
+                        'web_reputation_setting_smart_protection_local_server_enabled': {
+                            'value': 'false'
+                        },
+                        'web_reputation_setting_smart_protection_local_server_urls': {
+                            'value': ''
+                        },
+                        'web_reputation_setting_smart_protection_server_connection_lost_warning_enabled': {
+                            'value': 'true'
+                        },
+                        'web_reputation_setting_smart_protection_web_reputation_global_server_proxy_id': {
+                            'value': ''
+                        },
+                        'web_reputation_setting_syslog_config_id': {
+                            'value': '0'
+                        }
+                    },
+                    'computer_status': {
+                        'agent_status': 'error',
+                        'agent_status_messages': ['Offline',
+                            'Integrity Monitoring Rule '
+                            'Compile Issue'
+                        ],
+                        'appliance_status': None,
+                        'appliance_status_messages': None
+                    },
+                    'description': '',
+                    'display_name': '',
+                    'ec2_virtual_machine_summary': None,
+                    'esx_summary': None,
+                    'firewall': {
+                        'global_stateful_configuration_id': 1,
+                        'module_status': {
+                            'agent_status': 'inactive',
+                            'agent_status_message': 'Off, installed, 2 '
+                            'rules',
+                            'appliance_status': None,
+                            'appliance_status_message': None
+                        },
+                        'rule_ids': [23, 28],
+                        'state': 'off',
+                        'stateful_configuration_assignments': {
+                            'stateful_configuration_assignments': [{
+                                'interface_id': 34,
+                                'interface_type_id': None,
+                                'stateful_configuration_id': 1
+                            }]
+                        }
+                    },
+                    'group_id': 0,
+                    'host_name': 'WIN-Q0HITV3HJ6D',
+                    'id': 34,
+                    'integrity_monitoring': {
+                        'last_baseline_created': 1569386473746,
+                        'last_integrity_scan': None,
+                        'module_status': {
+                            'agent_status': 'error',
+                            'agent_status_message': 'Integrity '
+                            'Monitoring '
+                            'Rule '
+                            'Compile '
+                            'Issue',
+                            'appliance_status': None,
+                            'appliance_status_message': None
+                        },
+                        'rule_ids': None,
+                        'state': 'off'
+                    },
+                    'interfaces': {
+                        'interfaces': [{
+                            'detected': True,
+                            'dhcp': True,
+                            'display_name': '',
+                            'id': 34,
+                            'interface_type_id': None,
+                            'ips': None,
+                            'mac': '02:07:83:A8:4C:1A',
+                            'name': 'Local Area Connection 3'
+                        }]
+                    },
+                    'intrusion_prevention': {
+                        'application_type_ids': [117,
+                            243,
+                            268,
+                            287,
+                            299,
+                            300,
+                            301,
+                            303,
+                            304,
+                            340,
+                            352
+                        ],
+                        'module_status': {
+                            'agent_status': 'inactive',
+                            'agent_status_message': 'Off, '
+                            'installed, '
+                            '32 rules',
+                            'appliance_status': None,
+                            'appliance_status_message': None
+                        },
+                        'rule_ids': [2013,
+                            2285,
+                            2302,
+                            3218,
+                            3441,
+                            3600,
+                            3812,
+                            4167,
+                            4282,
+                            4432,
+                            4456,
+                            4458,
+                            4459,
+                            4460,
+                            4461,
+                            5400,
+                            5403,
+                            5762,
+                            5763,
+                            6281,
+                            6282,
+                            6298,
+                            6308,
+                            6378,
+                            6379,
+                            6419,
+                            6425,
+                            6676,
+                            6699,
+                            6700,
+                            6774,
+                            7007
+                        ],
+                        'state': 'off'
+                    },
+                    'last_agent_communication': 1569411611641,
+                    'last_appliance_communication': None,
+                    'last_ip_used': '192.168.22.2',
+                    'last_send_policy_request': 1574047585951,
+                    'last_send_policy_success': 1569386473666,
+                    'log_inspection': {
+                        'module_status': {
+                            'agent_status': 'inactive',
+                            'agent_status_message': 'Off, installed, '
+                            'no rules',
+                            'appliance_status': None,
+                            'appliance_status_message': None
+                        },
+                        'rule_ids': None,
+                        'state': 'off'
+                    },
+                    'no_connector_virtual_machine_summary': {
+                        'account_id': '686616308178',
+                        'directory_id': None,
+                        'instance_id': 'i-05767245e59a59bec',
+                        'region': 'ap-southeast-2',
+                        'user_name': None
+                    },
+                    'platform': 'Microsoft Windows Server 2008 R2 (64 bit) Service Pack 1 Build '
+                    '7601',
+                    'policy_id': 54,
+                    'relay_list_id': 0,
+                    'sap': None,
+                    'security_updates': {
+                        'anti_malware': [{
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Advanced Threat Correlation '
+                                'Pattern',
+                                'platform': 'All Platforms',
+                                'version': '1.121.00'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Advanced Threat Scan Engine',
+                                'platform': 'Windows 64-bit',
+                                'version': '11.000.1006'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Behavior Monitoring '
+                                'Configuration Pattern',
+                                'platform': 'All Platforms',
+                                'version': '1.237.00'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': False,
+                                'name': 'Behavior Monitoring Detection '
+                                'Pattern',
+                                'platform': 'Windows 64-bit',
+                                'version': '1.941.64'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Contextual Intelligence '
+                                'Pattern',
+                                'platform': 'All Platforms',
+                                'version': '102800'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Damage Cleanup Engine '
+                                'Configuration',
+                                'platform': 'All Platforms',
+                                'version': '16.1'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': False,
+                                'name': 'Damage Cleanup Template',
+                                'platform': 'All Platforms',
+                                'version': '1602'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Damage Recovery Pattern',
+                                'platform': 'All Platforms',
+                                'version': '1.7.2'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': False,
+                                'name': 'Digital Signature Pattern',
+                                'platform': 'All Platforms',
+                                'version': '1.721.00'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': False,
+                                'name': 'Endpoint Sensor Trusted '
+                                'Pattern',
+                                'platform': 'All Platforms',
+                                'version': '271058'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': False,
+                                'name': 'IntelliTrap Exception Pattern',
+                                'platform': 'All Platforms',
+                                'version': '1.647.00'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'IntelliTrap Pattern',
+                                'platform': 'All Platforms',
+                                'version': '0.251.00'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': False,
+                                'name': 'Memory Inspection Pattern',
+                                'platform': 'All Platforms',
+                                'version': '1.521.00'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Memory Scan Trigger Pattern',
+                                'platform': 'Windows 64-bit',
+                                'version': '1364'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Platform Configuration '
+                                'Pattern',
+                                'platform': 'All Platforms',
+                                'version': '5.5.1000'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Policy Enforcement Pattern',
+                                'platform': 'All Platforms',
+                                'version': '1.246.00'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Real-time Scan Flow Pattern',
+                                'platform': 'All Platforms',
+                                'version': '200005'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Scan Exception Local Pattern',
+                                'platform': 'All Platforms',
+                                'version': '110000'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Scan Exception OEM Pattern',
+                                'platform': 'All Platforms',
+                                'version': '110300'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'Scan Exception Pattern',
+                                'platform': 'All Platforms',
+                                'version': '110100'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': False,
+                                'name': 'Smart Scan Agent Pattern',
+                                'platform': 'All Platforms',
+                                'version': '15.385.00'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': False,
+                                'name': 'Spyware/Grayware Pattern',
+                                'platform': 'All Platforms',
+                                'version': '22.15'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': True,
+                                'name': 'System Driver Configuration',
+                                'platform': 'All Platforms',
+                                'version': '8.11.1028'
+                            },
+                            {
+                                'for_use_by': None,
+                                'latest': False,
+                                'name': 'Threat Tracing Pattern',
+                                'platform': 'Windows 64-bit',
+                                'version': '130764'
+                            }
+                        ],
+                        'last_changed': 1569399656226,
+                        'manifests': None,
+                        'other': None,
+                        'rules': None,
+                        'update_status': {
+                            'status': 'warning',
+                            'status_message': 'Out-of-Date'
+                        },
+                        'web_reputation_service': None
+                    },
+                    'tasks': {
+                        'agent_tasks': ['Update of Configuration Pending (Offline)'],
+                        'appliance_tasks': None
+                    },
+                    'vcloud_vm_virtual_machine_summary': None,
+                    'vmware_vm_virtual_machine_summary': None,
+                    'web_reputation': {
+                        'module_status': {
+                            'agent_status': 'inactive',
+                            'agent_status_message': 'Off, installed',
+                            'appliance_status': None,
+                            'appliance_status_message': None
+                        },
+                        'state': 'off'
+                    },
+                    'workspace_virtual_machine_summary': None
+                }
+
+        Returns:
+            dict
+
+        """
         computers_api = api.ComputersApi(self.api_client)
         computer = api.Computer()
         computer.policy_id = policy_id
 
         try:
-            computers_api.modify_computer(computer_id, computer, self.api_version, overrides=False)
+            output = computers_api.modify_computer(computer_id, computer, self.api_version, overrides=False)
 
         except ApiException as e:
             self.logger.entry('critical', str(e))
             sys.exit(1)
+
+        return output
 
     @staticmethod
     def _join_ints_as_str(int_list, sep=',') -> str:
