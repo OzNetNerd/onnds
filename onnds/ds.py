@@ -129,8 +129,9 @@ class Ds:
             app_list = app_type_api.list_application_types(self.api_version)
 
         except ApiException as e:
-            self.logger.entry('critical', str(e))
-            sys.exit(1)
+            msg = str(e)
+            self.logger.entry('critical', msg)
+            sys.exit(msg)
 
         app_types = dict()
 
@@ -380,8 +381,9 @@ class Ds:
             computer_list = computers_api.list_computers(self.api_version, expand=expand.list(), overrides=False)
 
         except ApiException as e:
-            self.logger.entry('critical', str(e))
-            sys.exit(1)
+            msg = str(e)
+            self.logger.entry('critical', msg)
+            sys.exit(msg)
 
         computers = dict()
 
@@ -1658,8 +1660,9 @@ class Ds:
                 self.logger.entry('info', f'Found {num_found} rules')
 
             except ApiException as e:
-                self.logger.entry('critical', str(e))
-                sys.exit(1)
+                msg = str(e)
+                self.logger.entry('critical', msg)
+                sys.exit(msg)
 
             for rule in rule_list.intrusion_prevention_rules:
                 ips_rules[rule.id] = rule
@@ -1828,8 +1831,9 @@ class Ds:
             return result
 
         except ApiException as e:
-            self.logger.entry('critical', str(e))
-            sys.exit(1)
+            msg = str(e)
+            self.logger.entry('critical', msg)
+            sys.exit(msg)
 
     def get_applied_ips_rules(self, policy_obj) -> list:
         """List of IPS rules applied to a policy
@@ -2721,8 +2725,9 @@ class Ds:
             return policy_id
 
         except ApiException as e:
-            self.logger.entry('critical', str(e))
-            sys.exit(1)
+            msg = str(e)
+            self.logger.entry('critical', msg)
+            sys.exit(msg)
 
     def add_ips_rules(self, policy_id, ips_rule_ids) -> dict:
         """Adds IPS rule(s) to a policy
@@ -2757,8 +2762,9 @@ class Ds:
             self.logger.entry('info', 'Successfully applied new rule(s)')
 
         except ApiException as e:
-            self.logger.entry('critical', str(e))
-            sys.exit(1)
+            msg = str(e)
+            self.logger.entry('critical', msg)
+            sys.exit(msg)
 
         return output
 
@@ -2788,8 +2794,9 @@ class Ds:
                 return output
 
             except ApiException as e:
-                self.logger.entry('critical', str(e))
-                sys.exit(1)
+                msg = str(e)
+                self.logger.entry('critical', msg)
+                sys.exit(msg)
 
     def set_computer_policy_id(self, computer_id, policy_id) -> dict:
         """Moves computer to specified Policy
@@ -3921,8 +3928,9 @@ class Ds:
             output = computers_api.modify_computer(computer_id, computer, self.api_version, overrides=False)
 
         except ApiException as e:
-            self.logger.entry('critical', str(e))
-            sys.exit(1)
+            msg = str(e)
+            self.logger.entry('critical', msg)
+            sys.exit(msg)
 
         return output
 
