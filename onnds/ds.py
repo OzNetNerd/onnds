@@ -8,9 +8,8 @@ import json
 import deepsecurity as api
 from deepsecurity.rest import ApiException
 from onnlogger import Loggers
-
-if os.path.exists('db.py'):
-    from .db import SetupDb
+from .libs.soap import DsSoap
+# from .libs.db import SetupDb
 
 PAGE_SIZE = 5000
 
@@ -37,28 +36,47 @@ class Ds:
         self.logger = Loggers(logger_name=self.app_name, console_logger=console_logger, print_logger=print_logger,
                               log_level=log_level, log_file_path=log_file_path)
 
-        try:
-            self.logger.entry('info', 'Obtaining DS API key')
-            ds_api_key = os.environ['DS_KEY']
+        # check if REST API is being used
+        ds_api_key = os.environ.get('DS_KEY')
+
+        # dsm_address = self._get_env_var('DS_ADDRESS', 'https://app.deepsecurity.trendmicro.com/api')
+        dsm_address = os.environ.get('DS_ADDRESS', 'https://app.deepsecurity.trendmicro.com')
+        self.logger.entry('info', f'Obtained DS address: {dsm_address}')
+
+        if ds_api_key:
+            rest_address = f'{dsm_address}/api'
+            self.logger.entry('info', 'Obtaining DS REST API key')
+
             self.api_version = os.environ.get('DS_API_VERSION', 'v1')
-            self.logger.entry('info', f'Set API version to {self.api_version}')
+            self.logger.entry('info', f'Set REST API version to {self.api_version}')
 
-        except KeyError:
-            sys.exit('"DS_KEY" environment variables are not set. Please set them and try again.')
+            self.logger.entry('info', 'Initiating REST API DS connection')
 
-        dsm_address = self._get_env_var('DS_API_ADDRESS', 'https://app.deepsecurity.trendmicro.com/api')
-        self.logger.entry('info', f'Obtained DS API address: {dsm_address}')
+            config = api.Configuration()
+            config.host = rest_address
+            config.api_key['api-secret-key'] = ds_api_key
+
+            self.api_client = api.ApiClient(config)
+
+        else:
+            self.api_client = None
+
+        # check if SOAP API is used
+        if os.environ.get('DS_USERNAME'):
+            self.ds_soap = DsSoap(self.logger)
+
+        else:
+            self.ds_soap = None
+
+        if not ds_api_key and not self.ds_soap:
+            msg = 'Please specify the "DS_KEY" environment variable if using the REST API. Otherwise, please specify ' \
+                  '"DS_USERNAME", "DS_PASSWORD" and "DS_TENANT" (if required) in order to use the SOAP API.'
+            self.logger.entry('critical', msg)
+            sys.exit(msg)
 
         self.enable_db_output = os.environ.get('DS_ENABLE_DB')
         if self.enable_db_output:
             self._db_setup()
-
-        self.logger.entry('info', 'Initiating DS connection')
-        config = api.Configuration()
-        config.host = dsm_address
-        config.api_key['api-secret-key'] = ds_api_key
-
-        self.api_client = api.ApiClient(config)
 
     def get_app_types(self) -> dict:
         """App type map with App ID as key
