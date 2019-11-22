@@ -16,6 +16,10 @@ pip3 install onnds
 * `DS_PASSWORD`: **Required** for methods which use the SOAP API
 * `DS_TENANT`: **Required** for methods which use the SOAP API in a multi-tenant environment
 
+## Examples
+
+Example [code snippets](examples/).
+
 # Contact
 
 * Blog: oznetnerd.com
