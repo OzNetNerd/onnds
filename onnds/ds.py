@@ -1708,8 +1708,13 @@ class Ds:
         Returns:
             str
         """
-        epoch_strip = str(epoch_time)[:-3]
-        epoch = int(epoch_strip)
+        if epoch_time:
+            epoch_strip = str(epoch_time)[:-3]
+            epoch = int(epoch_strip)
+
+        else:
+            # 1 January 1970 00:00:00
+            epoch = 0
 
         converted_time = time.strftime('%d/%m/%Y, %H:%M:%S %Z', time.localtime(epoch))
         return converted_time
