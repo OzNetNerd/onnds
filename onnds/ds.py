@@ -8,7 +8,7 @@ import json
 import deepsecurity as api
 from deepsecurity.rest import ApiException
 from onnlogger import Loggers
-from .libs.soap import DsSoap
+from .libs.legacy import DsLegacy
 # from .libs.db import SetupDb
 
 PAGE_SIZE = 5000
@@ -63,14 +63,14 @@ class Ds:
 
         # check if SOAP API is used
         if os.environ.get('DS_USERNAME'):
-            self.ds_soap = DsSoap(self.logger)
+            self.ds_legacy = DsLegacy(self.logger)
 
         else:
-            self.ds_soap = None
+            self.ds_legacy = None
 
-        if not ds_api_key and not self.ds_soap:
+        if not ds_api_key and not self.ds_legacy:
             msg = 'Please specify the "DS_KEY" environment variable if using the REST API. Otherwise, please specify ' \
-                  '"DS_USERNAME", "DS_PASSWORD" and "DS_TENANT" (if required) in order to use the SOAP API.'
+                  '"DS_USERNAME", "DS_PASSWORD" and "DS_TENANT" (if required) in order to use the legacy REST API.'
             self.logger.entry('critical', msg)
             sys.exit(msg)
 

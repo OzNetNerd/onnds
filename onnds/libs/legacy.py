@@ -3,14 +3,14 @@ import os
 import sys
 
 
-class DsSoap:
+class DsLegacy:
     def __init__(self, logger):
         self.logger = logger
-        self.logger.entry('info', 'Initiating connection to SOAP API & obtaining SOAP API key')
+        self.logger.entry('info', 'Initiating connection to legacy REST API & obtaining legacy REST API key')
 
         dsm_address = os.environ.get('DS_ADDRESS', 'https://app.deepsecurity.trendmicro.com')
-        self.soap_url = f'{dsm_address}/rest'
-        auth_url = f'{self.soap_url}/authentication/login'
+        self.legacy_url = f'{dsm_address}/rest'
+        auth_url = f'{self.legacy_url}/authentication/login'
 
         payload = {
             'dsCredentials':
@@ -29,13 +29,13 @@ class DsSoap:
 
         self.session = requests.Session()
         r = self.session.post(auth_url, json=payload)
-        self._check_api_response(r, error_msg='Could not obtain SOAP API SID:')
+        self._check_api_response(r, error_msg='Could not obtain legacy REST API SID:')
 
         sid = r.text
         self.session.cookies.set('sID', sid)
 
     def add_aws_account(self):
-        url = f'{self.soap_url}/cloudaccounts/aws'
+        url = f'{self.legacy_url}/cloudaccounts/aws'
 
         self.logger.entry('info', f'Obtaining AWS access & secret keys')
         try:

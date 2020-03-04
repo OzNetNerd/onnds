@@ -1,6 +1,6 @@
 # About
 
-Creates an AWS Cloud Connector using the SOAP API.
+Creates an AWS Cloud Connector using the legacy REST API.
 
 ## Usage
 1. Install `onnds`:
@@ -28,7 +28,7 @@ python3 cc.py
 
 ```
 INFO - Obtained DS address: https://app.deepsecurity.trendmicro.com
-INFO - Initiating connection to SOAP API & obtaining SOAP API key
+INFO - Initiating connection to legacy REST API & obtaining legacy  REST API key
 INFO - Obtaining AWS access & secret keys
 INFO - Adding AWS account using the Cloud Connector address https://app.deepsecurity.trendmicro.com/rest/cloudaccounts/aws
 INFO - Successfully added AWS cloud account
