@@ -1713,20 +1713,18 @@ class Ds:
             epoch_strip = str(epoch_time)[:-3]
             epoch = int(epoch_strip)
 
-        else:
-            # 1 January 1970 00:00:00
-            epoch = 0
-
         converted_time = time.strftime('%d/%m/%Y, %H:%M:%S %Z', time.localtime(epoch))
         return converted_time
 
     def generate_output(self, report_entries, filename, output_format) -> None:
-        if output_format == 'CSV':
+        if output_format.upper() == 'CSV':
             self._generate_csv(report_entries, filename)
 
-        elif output_format == 'JSON':
+        elif output_format.upper() == 'JSON':
             with open(filename, 'w') as f:
                 f.write(report_entries)
+
+            self.logger.entry('info', 'Report generated successfully')
 
     def _generate_csv(self, report_entries, filename) -> None:
         """Turns a list of dicts into a CSV file
