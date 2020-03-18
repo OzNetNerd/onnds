@@ -9,6 +9,7 @@ import deepsecurity as api
 from deepsecurity.rest import ApiException
 from onnlogger import Loggers
 from .libs.legacy import DsLegacy
+
 # from .libs.db import SetupDb
 
 PAGE_SIZE = 5000
@@ -1719,7 +1720,15 @@ class Ds:
         converted_time = time.strftime('%d/%m/%Y, %H:%M:%S %Z', time.localtime(epoch))
         return converted_time
 
-    def generate_csv(self, report_entries, filename) -> None:
+    def generate_output(self, report_entries, filename, output_format) -> None:
+        if output_format == 'CSV':
+            self._generate_csv(report_entries, filename)
+
+        elif output_format == 'JSON':
+            with open(filename, 'w') as f:
+                f.write(report_entries)
+
+    def _generate_csv(self, report_entries, filename) -> None:
         """Turns a list of dicts into a CSV file
 
         Examples:
@@ -1730,11 +1739,11 @@ class Ds:
 
             """
         with open(filename, 'w') as f:
-            columns = list(report_entries[0].keys())
-            writer = csv.DictWriter(f, fieldnames=columns)
-            writer.writeheader()
-            for row in report_entries:
-                writer.writerow(row)
+            columns = ['CVE', 'Rule ID']
+            report_entries.insert(0, columns)
+
+            writer = csv.writer(f)
+            writer.writerows(report_entries)
 
         self.logger.entry('info', 'Report generated successfully')
 
@@ -3965,33 +3974,28 @@ class Ds:
         return joined_ips_rules
 
     def output_cve_ips_map(self, cve_ips_map, output_format='CSV'):
-        output_format_upper = output_format.upper()
+        msg = f'CVE to IPS rule map:\n{cve_ips_map}'
+        self.logger.entry('info', msg, replace_newlines=False, replace_json=True)
 
-        msg = ['CVE to IPS rule map:\n']
+        output_format_upper = output_format.upper()
 
         if output_format_upper == 'JSON':
             output = json.dumps(cve_ips_map)
 
         else:
-            msg.append('CVE,IPS Rule ID\n')
             output = self._cve_ips_csv_format(cve_ips_map)
 
-        msg.append(output)
-        msg = ''.join(msg)
-
-        self.logger.entry('info', msg, replace_newlines=False, replace_json=True)
+        return output
 
     def _cve_ips_csv_format(self, cve_ips_map):
         output = []
 
         for cve, ips_rules in cve_ips_map.items():
             joined_rules = self._join_ints_as_str(ips_rules, sep=' ')
-            entry = f'{cve},{joined_rules}'
+            entry = [cve, joined_rules]
             output.append(entry)
 
-        joined_output = '\n'.join(output)
-
-        return joined_output
+        return output
 
     def json_response(self, status_code, msg) -> dict:
         """Formats Lambda output
