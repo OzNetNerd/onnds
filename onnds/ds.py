@@ -2721,6 +2721,8 @@ class Ds:
             int: Policy ID"""
 
         self.logger.entry('info', f'Policy name "{policy_name}" does not exist. Creating it...')
+        ips_settings = api.IntrusionPreventionPolicyExtension()
+        ips_settings.state = 'prevent'
 
         # Create and configure a new policy
         new_policy = api.Policy()
@@ -2728,6 +2730,7 @@ class Ds:
         new_policy.description = f'{policy_name} policy'
         new_policy.detection_engine_state = 'off'
         new_policy.auto_requires_update = 'on'
+        new_policy.intrusion_prevention = ips_settings
 
         # Create search criteria to retrieve the Base Policy
         search_criteria = api.SearchCriteria()
