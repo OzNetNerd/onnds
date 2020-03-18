@@ -5,11 +5,11 @@ with open('README.md', 'r') as f:
 
 setup(
     name='onnds',
-    version='0.0.15',
+    version='0.0.17',
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=find_packages(),
-    url='http://oznetnerd.com',
+    url='https://oznetnerd.com',
     install_requires=[
         'deep-security-api>=12.0.327',
         'onnlogger==0.0.3',

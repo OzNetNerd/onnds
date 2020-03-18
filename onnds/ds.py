@@ -1737,7 +1737,7 @@ class Ds:
 
             """
         with open(filename, 'w') as f:
-            columns = ['CVE', 'Rule ID']
+            columns = ['CVE', 'Rule ID', 'Description']
             report_entries.insert(0, columns)
 
             writer = csv.writer(f)
@@ -1827,12 +1827,14 @@ class Ds:
 
             for cve in cves:
                 if cve not in cve_map:
-                    cve_map[cve] = [ips_id]
+                    cve_map[cve] = {
+                        'rule_ids': [ips_id],
+                        'description': ips_info.description
+                    }
 
                 else:
-                    cve_map[cve].append(ips_id)
+                    cve_map[cve]['rule_ids'].append(ips_id)
 
-        self.logger.entry('debug', pformat(cve_map))
         return cve_map
 
     def _find_exact_match(self, search_field, search_value, search_type, object_api):
@@ -3992,8 +3994,11 @@ class Ds:
         output = []
 
         for cve, ips_rules in cve_ips_map.items():
-            joined_rules = self._join_ints_as_str(ips_rules, sep=' ')
-            entry = [cve, joined_rules]
+            description = ips_rules['description']
+            rule_ids = ips_rules['rule_ids']
+
+            joined_rules = self._join_ints_as_str(rule_ids, sep=' ')
+            entry = [cve, joined_rules, description]
             output.append(entry)
 
         return output
